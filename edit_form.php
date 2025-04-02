@@ -73,6 +73,11 @@ class enrol_coursepayment_edit_form extends moodleform {
         $mform->setDefault('cost', format_float(str_replace(',', '.', $plugin->get_config('cost')),
             2, true));
 
+        // Check if profile based pricing is enabled.
+        if (enrol_coursepayment_helper::has_profile_based_pricing()) {
+            $this->add_profile_based_pricing_fields();
+        }
+
         $currencies = $plugin->get_currencies();
         $mform->addElement('select', 'currency', get_string('currency', 'enrol_coursepayment'),
             $currencies);
@@ -166,7 +171,88 @@ class enrol_coursepayment_edit_form extends moodleform {
             $errors['expirythreshold'] = get_string('errorthresholdlow', 'core_enrol');
         }
 
+        if (!empty($data['profile_pricing'] )) {
+            foreach ($data['profile_pricing'] as $i => $fields) {
+                if (empty($fields['profile_value'])) {
+                    continue;
+                }
+
+                $cost = str_replace(',', '.', $fields['profile_cost']);
+                if (!is_numeric($cost)) {
+                    $errors['profile_pricing[' . $i . ']'] = get_string('costerror', 'enrol_coursepayment');
+                }
+            }
+        }
+
         return $errors;
     }
+
+    /**
+     * add_profile_based_pricing_fields
+     * @throws coding_exception
+     */
+    private function add_profile_based_pricing_fields(): void {
+        $mform = $this->_form;
+        $mform->addElement('header', 'header_profile_based_pricing',
+            get_string('profile_based_pricing', 'enrol_coursepayment'));
+
+        $textboxgroup = [];
+        $textboxgroup[] = $mform->createElement('group', 'profile_pricing',
+            get_string('profile_based_pricing_rule', 'enrol_coursepayment'),
+            $this->rules_group($mform));
+
+        $this->repeat_elements($textboxgroup, $this->get_repeat_counter(), $this->repeated_options(),
+            'repeat_number', 'addtexts', 1);
+    }
+
+    /**
+     * Returns an array for form repeat options.
+     *
+     * @return array Array of repeat options
+     */
+    protected function repeated_options(): array {
+        $repeatedoptions = [];
+        $repeatedoptions['profile_pricing[profile_value]']['type'] = PARAM_TEXT;
+        $repeatedoptions['profile_pricing[profile_cost]']['type'] = PARAM_TEXT;
+
+        return $repeatedoptions;
+    }
+
+
+    /**
+     * rules_group
+     * @param $mform
+     *
+     * @return array
+     * @throws \coding_exception
+     */
+    protected function rules_group($mform): array {
+        $grouparray = [];
+        $grouparray[] = $mform->createElement('text', 'profile_value', get_string('profile_value', 'enrol_coursepayment'), [
+            'size' => 30,
+            'placeholder' => get_string('profile_value_placeholder', 'enrol_coursepayment'),
+        ]);
+        $grouparray[] = $mform->createElement('text', 'profile_cost', get_string('cost', 'enrol_coursepayment'), [
+            'size' => 30,
+            'placeholder' => get_string('profile_cost_placeholder', 'enrol_coursepayment'),
+        ]);
+
+        return $grouparray;
+    }
+
+    /**
+     * get_repeat_counter
+     * @return int
+     */
+    private function get_repeat_counter(): int {
+        // Get counter of the repeats.
+        $pricing = $this->instance->profile_pricing ?? 1;
+        if ($pricing === 1) {
+            return 1;
+        }
+
+        return count($pricing);
+    }
+
 
 }

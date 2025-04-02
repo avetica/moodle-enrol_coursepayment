@@ -285,5 +285,27 @@ function xmldb_enrol_coursepayment_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2019040300, 'enrol', 'coursepayment');
     }
 
+    if ($oldversion < 2025040101) {
+
+        // Define table enrol_coursepayment_profile to be created.
+        $table = new xmldb_table('enrol_coursepayment_profile');
+
+        // Adding fields to table enrol_coursepayment_profile.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('enrol_id', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+        $table->add_field('profile_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('profile_cost', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for enrol_coursepayment_profile.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Coursepayment savepoint reached.
+        upgrade_plugin_savepoint(true, 2025040101, 'enrol', 'coursepayment');
+    }
+
     return true;
 }

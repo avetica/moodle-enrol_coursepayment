@@ -86,3 +86,10 @@ $settings->add(new admin_setting_configcheckbox('enrol_coursepayment/multi_accou
 $settings->add(new admin_setting_configcheckbox('enrol_coursepayment/report_include_none_payment_users',
     get_string('report_include_none_payment_users', 'enrol_coursepayment'),
     '', 1));
+
+// Profile field mapping.
+$profilefields = enrol_coursepayment_helper::get_profile_fields();
+$settings->add(new admin_setting_configselect('enrol_coursepayment/profile_based_price',
+    get_string('profile_based_price_mapping', 'enrol_coursepayment'),
+    get_string('profile_based_price_mapping_desc', 'enrol_coursepayment'), '',
+    $profilefields));

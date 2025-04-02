@@ -385,3 +385,13 @@ $string['pdf'] = 'PDF';
 $string['messageprovider:coursepayment_enrolment'] = 'Enrolment bericht';
 $string['messageprovider:expiry_notification'] = 'Verval bericht';
 $string['messageprovider:coursepayment_invoice'] = 'Factuur bericht';
+
+// Profile pricing.
+$string['profile_based_price_mapping'] = 'Profielveld voor prijs bepaling ';
+$string['profile_based_price_mapping_desc'] = 'Als er een profielveld is geselecteerd, kunt u de prijzen in kaart brengen op basis van een waarde';
+$string['profile_based_pricing'] = 'Prijs op basis van profielveld';
+$string['profile_value_placeholder'] = 'Profiel veld waarde';
+$string['profile_cost_placeholder'] = 'Prijs voor op basis van profielveld waarde';
+$string['profile_based_pricing_rule'] = 'Prijsregel';
+$string['profile_value'] = 'Profielveld waarde';
+
