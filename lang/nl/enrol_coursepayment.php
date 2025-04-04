@@ -24,6 +24,9 @@
  * @author    Luuk Verhoeven
  */
 
+// phpcs:disable moodle.Files.LangFilesOrdering.UnexpectedComment
+// phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
+
 $string['pluginname'] = 'CoursePayment';
 $string['pluginname_desc'] = 'Deze plugin maakt het mogelijk om een cursus te verkopen met een betaal provider';
 $string['mailadmins'] = 'E-mail admin';
