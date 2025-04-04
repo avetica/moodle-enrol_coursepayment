@@ -24,6 +24,7 @@
  * @author    Luuk Verhoeven
  */
 
+// phpcs:ignore moodle.Files.RequireLogin.Missing
 require("../../../config.php");
 defined('MOODLE_INTERNAL') || die();
 

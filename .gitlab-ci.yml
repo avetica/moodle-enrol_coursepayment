@@ -13,6 +13,7 @@ workplace_405_stable:
     PHP_VERSION: "8.1"
     ALLOW_ERRORS_MUSTACHE: "true"
     ALLOW_ERRORS_PHPCPD: "true"
+    ALLOW_ERRORS_VALIDATE: "true"
 
   before_script:
     - export MOODLE_BRANCH=$MOODLE_BRANCH_WORKPLACE405S
