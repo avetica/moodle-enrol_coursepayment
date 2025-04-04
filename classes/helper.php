@@ -354,6 +354,7 @@ class enrol_coursepayment_helper {
     }
 
     /**
+     * update_profile_pricing
      * @param int    $enrolid
      * @param object $data
      *

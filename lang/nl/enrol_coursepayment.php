@@ -394,4 +394,3 @@ $string['profile_value_placeholder'] = 'Profiel veld waarde';
 $string['profile_cost_placeholder'] = 'Prijs voor op basis van profielveld waarde';
 $string['profile_based_pricing_rule'] = 'Prijsregel';
 $string['profile_value'] = 'Profielveld waarde';
-
