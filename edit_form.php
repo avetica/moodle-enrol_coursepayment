@@ -75,7 +75,7 @@ class enrol_coursepayment_edit_form extends moodleform {
 
         // Check if profile based pricing is enabled.
         if (enrol_coursepayment_helper::has_profile_based_pricing()) {
-            $this->add_profile_based_pricing_fields();
+            $this->add_profile_based_pricing_fields($instance);
         }
 
         $currencies = $plugin->get_currencies();
@@ -189,9 +189,10 @@ class enrol_coursepayment_edit_form extends moodleform {
 
     /**
      * add_profile_based_pricing_fields
+     * @param mixed $instance
      * @throws coding_exception
      */
-    private function add_profile_based_pricing_fields(): void {
+    private function add_profile_based_pricing_fields($instance): void {
         $mform = $this->_form;
         $mform->addElement('header', 'header_profile_based_pricing',
             get_string('profile_based_pricing', 'enrol_coursepayment'));
@@ -201,7 +202,7 @@ class enrol_coursepayment_edit_form extends moodleform {
             get_string('profile_based_pricing_rule', 'enrol_coursepayment'),
             $this->rules_group($mform));
 
-        $this->repeat_elements($textboxgroup, $this->get_repeat_counter(), $this->repeated_options(),
+        $this->repeat_elements($textboxgroup, $this->get_repeat_counter($instance), $this->repeated_options(),
             'repeat_number', 'addtexts', 1);
     }
 
@@ -242,11 +243,13 @@ class enrol_coursepayment_edit_form extends moodleform {
 
     /**
      * get_repeat_counter
+     *
+     * @param mixed $instance
      * @return int
      */
-    private function get_repeat_counter(): int {
+    private function get_repeat_counter($instance): int {
         // Get counter of the repeats.
-        $pricing = $this->instance->profile_pricing ?? 1;
+        $pricing = $instance->profile_pricing ?? 1;
         if ($pricing === 1) {
             return 1;
         }
