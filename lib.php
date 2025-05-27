@@ -233,6 +233,7 @@ class enrol_coursepayment_plugin extends enrol_plugin {
             return ob_get_clean();
         }
 
+        $instance->cost = enrol_coursepayment_helper::get_decimal_instance_costs($instance);
         $cost = (float) ($instance->cost <= 0) ? $this->get_config('cost') : $instance->cost;
 
         if (abs($cost) < 0.01 || isguestuser()) {

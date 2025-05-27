@@ -296,4 +296,126 @@ class enrol_coursepayment_helper {
         return str_replace('<br />', "\n", $html);
     }
 
+    /**
+     * has_profile_based_pricing
+     * @return bool
+     * @throws dml_exception
+     */
+    public static function has_profile_based_pricing(): bool {
+        $config = get_config('enrol_coursepayment', 'profile_based_price');
+
+        return !empty($config);
+    }
+
+    /**
+     * get_decimal_instance_costs
+     * @param stdClass $instance
+     *
+     * @return float
+     * @throws dml_exception
+     */
+    public static function get_decimal_instance_costs(stdClass $instance): float {
+        global $DB;
+
+        // Not support for activities.
+        if (self::has_profile_based_pricing() === false || !empty($instance->is_activity)) {
+            return $instance->cost;
+        }
+
+        $profilevalue = self::get_user_pricing_profile_value();
+
+        // Check if there is a matching price.
+        $cost = $DB->get_field('enrol_coursepayment_profile', 'profile_cost', [
+            'profile_value' => $profilevalue,
+            'enrol_id' => $instance->id,
+        ]);
+
+        if (is_numeric($cost)) {
+            return $cost;
+        }
+
+        return $instance->cost;
+    }
+
+    /**
+     * get_user_pricing_profile_value
+     * @return string
+     * @throws dml_exception
+     */
+    private static function get_user_pricing_profile_value(): string {
+        global $DB, $USER;
+
+        $fieldid = get_config('enrol_coursepayment', 'profile_based_price');
+
+        return trim($DB->get_field('user_info_data', 'data', [
+            'userid' => $USER->id,
+            'fieldid' => $fieldid,
+        ]));
+    }
+
+    /**
+     * update_profile_pricing
+     * @param int    $enrolid
+     * @param object $data
+     *
+     * @throws dml_exception
+     */
+    public static function update_profile_pricing(int $enrolid, object $data): void {
+        global $DB;
+
+        if (self::has_profile_based_pricing() === false) {
+            return;
+        }
+
+        if (empty($data->profile_pricing)) {
+            return;
+        }
+
+        // Flush.
+        $DB->delete_records('enrol_coursepayment_profile', ['enrol_id' => $enrolid]);
+
+        $now = time();
+        foreach ($data->profile_pricing as $fields) {
+
+            if (empty($fields['profile_value'])) {
+                continue;
+            }
+
+            $record = (object)[
+                'enrol_id' => $enrolid,
+                'profile_cost' => str_replace(',', '.', $fields['profile_cost']),
+                'profile_value' => $fields['profile_value'],
+                'timecreated' => $now,
+            ];
+
+            $DB->insert_record('enrol_coursepayment_profile', $record);
+        }
+    }
+
+    /**
+     * get_profile_pricing
+     * @param int $enrolid
+     *
+     * @return array|\string[][]
+     * @throws dml_exception
+     */
+    public static function get_profile_pricing(int $enrolid): array {
+        global $DB;
+
+        if (self::has_profile_based_pricing() === false) {
+            return [];
+        }
+
+        $rs = $DB->get_recordset('enrol_coursepayment_profile', ['enrol_id' => $enrolid]);
+        $profilepricing = [];
+        foreach ($rs as $row) {
+            $profilepricing[] = [
+                'profile_value' => $row->profile_value,
+                'profile_cost' => str_replace('.', ',', $row->profile_cost),
+            ];
+        }
+
+        return $profilepricing;
+    }
+
 }

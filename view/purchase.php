@@ -68,6 +68,7 @@ if ($instance->enrolenddate != 0 && $instance->enrolenddate < time()) {
     redirect(new moodle_url('/'));
 }
 
+$instance->cost = enrol_coursepayment_helper::get_decimal_instance_costs($instance);
 $cost = (float) ($instance->cost <= 0) ? $this->get_config('cost') : $instance->cost;
 
 if (abs($cost) < 0.01 || isguestuser()) {

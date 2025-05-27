@@ -57,6 +57,7 @@ if ($instanceid) {
         'id' => $instanceid,
     ], '*', MUST_EXIST);
     $instance->cost = format_float($instance->cost, 2, true);
+    $instance->profile_pricing = enrol_coursepayment_helper::get_profile_pricing($instance->id);
 } else {
     require_capability('moodle/course:enrolconfig', $context);
     // No instance yet, we have to add new instance.
@@ -107,6 +108,7 @@ if ($mform->is_cancelled()) {
             $instance->timemodified = time();
             $DB->update_record('enrol', $instance);
 
+            $enrolid = $instance->id;
             if ($reset) {
                 $context->mark_dirty();
             }
@@ -128,8 +130,10 @@ if ($mform->is_cancelled()) {
                 'customint1' => $data->customint1,
                 'expirythreshold' => $data->expirythreshold,
             ];
-            $plugin->add_instance($course, $fields);
+            $enrolid = $plugin->add_instance($course, $fields);
         }
+
+        enrol_coursepayment_helper::update_profile_pricing($enrolid , $data);
 
         redirect($return);
     }

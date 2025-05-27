@@ -24,6 +24,9 @@
  * @author    Luuk Verhoeven
  */
 
+// phpcs:disable moodle.Files.LangFilesOrdering.UnexpectedComment
+// phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
+
 $string['pluginname'] = 'CoursePayment';
 $string['pluginname_desc'] = 'This plugin allows you to purchase course with a payment gateway';
 $string['mailadmins'] = 'Notify admin';
@@ -395,3 +398,13 @@ $string['posy_help'] = 'You can use the reposition mode for this';
 $string['messageprovider:coursepayment_enrolment'] = 'Enrolment message';
 $string['messageprovider:expiry_notification'] = 'Expiry message';
 $string['messageprovider:coursepayment_invoice'] = 'Invoice message';
+
+// Profile pricing.
+$string['profile_based_price_mapping'] = 'Profile based pricing';
+$string['profile_based_price_mapping_desc'] = 'When there is a profile field selected, you can map pricing based on a value';
+$string['profile_based_pricing'] = 'Price based on profile value match';
+$string['profile_value_placeholder'] = 'Matching profile value';
+$string['profile_cost_placeholder'] = 'Price for the matching profile field value';
+$string['profile_based_pricing_rule'] = 'Pricing rule';
+$string['profile_value'] = 'Profile field value';
+$string['costerror'] = 'Error: wrong price format';

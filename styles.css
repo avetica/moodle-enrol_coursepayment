@@ -106,7 +106,7 @@
 .cpbtop {
     border: 1px solid gray;
     border-bottom: none;
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0 0;
 }
 
 .cpbmiddle {
@@ -117,17 +117,15 @@
 .cpbbottom {
     border: 1px solid gray;
     border-top: none;
-    border-radius: 0px 0px 10px 10px;
+    border-radius: 0 0 10px 10px;
 }
 
 .coursepayment-btn {
+    /* stylelint-disable */
     border-radius: 5px 5px 5px 5px !important;
+    /* stylelint-enable */
 }
 
-/*
-    This is a hack - the fieldset being returned by the edit_element_form class contains
-    the CSS class 'hidden' which when shown in a dialogue hides the fieldset.
-*/
 .moodle-dialogue #editelementform fieldset.hidden {
     display: block;
 }
