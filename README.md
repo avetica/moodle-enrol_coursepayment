@@ -51,6 +51,7 @@ Has support for:
 
 See Git for the complete history, major changes will be listed below.
 
+- 2025060300 - upcoming changes to API identifiers
 - 2025040100 - profile fields support.
 - 2025012800 - iDeal 2.0 support implemented, Mollie PHP Client version updated to v2.76.1.
 - 2024091300 - Moodle 4.5 support implemented.
