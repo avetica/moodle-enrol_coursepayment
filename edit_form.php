@@ -222,7 +222,7 @@ class enrol_coursepayment_edit_form extends moodleform {
 
     /**
      * rules_group
-     * @param $mform
+     * @param MoodleQuickForm $mform
      *
      * @return array
      * @throws \coding_exception
