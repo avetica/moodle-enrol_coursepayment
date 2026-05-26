@@ -408,85 +408,99 @@ class enrol_coursepayment_mollie extends enrol_coursepayment_gateway {
             'message' => '',
         ];
 
-        // First check if we know of it.
-        $enrolcoursepayment = $DB->get_record('enrol_coursepayment', [
-            'orderid' => $orderid,
-            'gateway' => $this->name,
-        ]);
+        // Serialize validation per orderid so the Mollie webhook and return.php cannot both
+        // pass the "not yet success" check and trigger send_invoice + enrol twice.
+        $lockfactory = \core\lock\lock_config::get_lock_factory('enrol_coursepayment_validate_order');
+        $lock = $lockfactory->get_lock($orderid, 10);
+        if (!$lock) {
+            $return['message'] = get_string('error:waiting_on_payment', 'enrol_coursepayment');
 
-        if ($enrolcoursepayment) {
+            return $return;
+        }
 
-            // Missing a transactionid this is not good.
-            if (empty($enrolcoursepayment->gateway_transaction_id)) {
-                $obj = new stdClass();
-                $obj->id = $enrolcoursepayment->id;
-                $obj->timeupdated = time();
-                $obj->status = self::PAYMENT_STATUS_ERROR;
-                $DB->update_record('enrol_coursepayment', $obj);
+        try {
+            // First check if we know of it. Re-read inside the lock so the loser sees the winner's status update.
+            $enrolcoursepayment = $DB->get_record('enrol_coursepayment', [
+                'orderid' => $orderid,
+                'gateway' => $this->name,
+            ]);
 
-                $return['status'] = false;
-                $return['message'] = 'empty_transaction_id';
+            if ($enrolcoursepayment) {
 
-                return $return;
-            }
-
-            // Payment already marked as paid.
-            if ($enrolcoursepayment->status == self::PAYMENT_STATUS_SUCCESS) {
-                $return['status'] = true;
-                $return['message'] = 'already_marked_as_paid';
-
-                return $return;
-            }
-
-            try {
-                // This will fix issues when using multi-account in cron.
-                $this->load_multi_account_config($enrolcoursepayment->userid);
-
-                // Reload API key.
-                $this->reload_api_key(); // Use new settings if needed.
-
-                // Get details from gateway.
-                $payment = $this->client->payments->get($enrolcoursepayment->gateway_transaction_id);
-                $obj = new stdClass();
-                $obj->id = $enrolcoursepayment->id;
-                $obj->timeupdated = time();
-
-                if ($payment->isPaid() == true && $enrolcoursepayment->status != self::PAYMENT_STATUS_SUCCESS) {
-                    // Sending the invoice to customer.
-                    // Make sure we save invoice number to prevent incorrect number.
-                    $this->send_invoice($enrolcoursepayment, ucfirst($this->name));
+                // Missing a transactionid this is not good.
+                if (empty($enrolcoursepayment->gateway_transaction_id)) {
+                    $obj = new stdClass();
+                    $obj->id = $enrolcoursepayment->id;
+                    $obj->timeupdated = time();
+                    $obj->status = self::PAYMENT_STATUS_ERROR;
                     $DB->update_record('enrol_coursepayment', $obj);
 
-                    // At this point you'd probably want to start the process of delivering the product to the customer.
-                    if ($this->enrol($enrolcoursepayment)) {
-                        $obj->status = self::PAYMENT_STATUS_SUCCESS;
-                        $return['status'] = true;
-                    }
+                    $return['status'] = false;
+                    $return['message'] = 'empty_transaction_id';
 
-                } else if ($payment->isOpen() == false) {
-
-                    // The payment isn't paid and isn't open anymore. We can assume it was aborted.
-                    // We can mark this payment as aborted.
-                    $obj->status = self::PAYMENT_STATUS_ABORT;
-                    $return['message'] = get_string('error:paymentabort', 'enrol_coursepayment');
-
-                } else if ($payment->isOpen()) {
-
-                    // The payment isn't paid and is still open. We can assume it awaits payment.
-                    // We can mark this payment as waiting.
-                    $obj->status = self::PAYMENT_STATUS_WAITING;
-                    $return['message'] = get_string('error:waiting_on_payment', 'enrol_coursepayment');
+                    return $return;
                 }
 
-                $DB->update_record('enrol_coursepayment', $obj);
+                // Payment already marked as paid.
+                if ($enrolcoursepayment->status == self::PAYMENT_STATUS_SUCCESS) {
+                    $return['status'] = true;
+                    $return['message'] = 'already_marked_as_paid';
 
-            } catch (ApiException $e) {
-                $this->log("API call failed: " . htmlspecialchars($e->getMessage()));
-                $return['message'] = get_string('error:gettingorderdetails', 'enrol_coursepayment');
+                    return $return;
+                }
+
+                try {
+                    // This will fix issues when using multi-account in cron.
+                    $this->load_multi_account_config($enrolcoursepayment->userid);
+
+                    // Reload API key.
+                    $this->reload_api_key(); // Use new settings if needed.
+
+                    // Get details from gateway.
+                    $payment = $this->client->payments->get($enrolcoursepayment->gateway_transaction_id);
+                    $obj = new stdClass();
+                    $obj->id = $enrolcoursepayment->id;
+                    $obj->timeupdated = time();
+
+                    if ($payment->isPaid() == true && $enrolcoursepayment->status != self::PAYMENT_STATUS_SUCCESS) {
+                        // Sending the invoice to customer.
+                        // Make sure we save invoice number to prevent incorrect number.
+                        $this->send_invoice($enrolcoursepayment, ucfirst($this->name));
+                        $DB->update_record('enrol_coursepayment', $obj);
+
+                        // At this point you'd probably want to start the process of delivering the product to the customer.
+                        if ($this->enrol($enrolcoursepayment)) {
+                            $obj->status = self::PAYMENT_STATUS_SUCCESS;
+                            $return['status'] = true;
+                        }
+
+                    } else if ($payment->isOpen() == false) {
+
+                        // The payment isn't paid and isn't open anymore. We can assume it was aborted.
+                        // We can mark this payment as aborted.
+                        $obj->status = self::PAYMENT_STATUS_ABORT;
+                        $return['message'] = get_string('error:paymentabort', 'enrol_coursepayment');
+
+                    } else if ($payment->isOpen()) {
+
+                        // The payment isn't paid and is still open. We can assume it awaits payment.
+                        // We can mark this payment as waiting.
+                        $obj->status = self::PAYMENT_STATUS_WAITING;
+                        $return['message'] = get_string('error:waiting_on_payment', 'enrol_coursepayment');
+                    }
+
+                    $DB->update_record('enrol_coursepayment', $obj);
+
+                } catch (ApiException $e) {
+                    $this->log("API call failed: " . htmlspecialchars($e->getMessage()));
+                    $return['message'] = get_string('error:gettingorderdetails', 'enrol_coursepayment');
+                }
+
+            } else {
+                $return['message'] = get_string('error:unknown_order', 'enrol_coursepayment');
             }
-
-        } else {
-            $return['message'] = get_string('error:unknown_order', 'enrol_coursepayment');
+        } finally {
+            $lock->release();
         }
 
         return $return;
