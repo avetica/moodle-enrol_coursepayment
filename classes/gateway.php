@@ -603,6 +603,9 @@ abstract class enrol_coursepayment_gateway {
         // Generate PDF invoice.
         $file = template::render($coursepayment, $user, $this->pluginconfig, $a);
 
+        // Track recipients by email so a user matching multiple roles (e.g. teacher and admin) only receives one invoice mail.
+        $sentto = [];
+
         if (!empty($this->pluginconfig->mailstudents_invoice)) {
 
             $eventdata = enrol_coursepayment_helper::get_event_object();
@@ -619,6 +622,7 @@ abstract class enrol_coursepayment_gateway {
             $eventdata->attachment = $file;
             $eventdata->attachname = $a->invoice_number . '.pdf';
 
+            $sentto[core_text::strtolower(trim($user->email))] = true;
             message_send($eventdata);
         }
 
@@ -648,7 +652,11 @@ abstract class enrol_coursepayment_gateway {
                 $eventdata->smallmessage = '';
                 $eventdata->attachment = $file;
                 $eventdata->attachname = $a->invoice_number . '.pdf';
-                message_send($eventdata);
+                $teacheremail = core_text::strtolower(trim($teacher->email));
+                if (empty($sentto[$teacheremail])) {
+                    $sentto[$teacheremail] = true;
+                    message_send($eventdata);
+                }
             }
         }
 
@@ -656,6 +664,11 @@ abstract class enrol_coursepayment_gateway {
 
             $admins = get_admins();
             foreach ($admins as $admin) {
+                $adminemail = core_text::strtolower(trim($admin->email));
+                if (!empty($sentto[$adminemail])) {
+                    continue;
+                }
+                $sentto[$adminemail] = true;
                 $eventdata = enrol_coursepayment_helper::get_event_object();
                 $eventdata->modulename = 'moodle';
                 $eventdata->component = 'enrol_coursepayment';
@@ -678,6 +691,10 @@ abstract class enrol_coursepayment_gateway {
             foreach ($parts as $part) {
                 $part = trim($part);
                 if (filter_var($part, FILTER_VALIDATE_EMAIL)) {
+                    if (!empty($sentto[core_text::strtolower($part)])) {
+                        continue;
+                    }
+                    $sentto[core_text::strtolower($part)] = true;
                     // Get temp user object.
                     $dummyuser = new stdClass();
                     $dummyuser->id = 1;
