@@ -529,6 +529,9 @@ abstract class enrol_coursepayment_gateway {
             message_send($eventdata);
         }
 
+        // Track staff recipients so a user who is both teacher and admin only gets one enrolment notification.
+        $sentto = [];
+
         if (!empty($mailteachers) && !empty($teacher)) {
             $a->course = format_string($course->fullname, true, ['context' => $context]);
             $a->user = fullname($user);
@@ -544,6 +547,7 @@ abstract class enrol_coursepayment_gateway {
             $eventdata->fullmessageformat = FORMAT_PLAIN;
             $eventdata->fullmessagehtml = '';
             $eventdata->smallmessage = '';
+            $sentto[core_text::strtolower(trim($teacher->email))] = true;
             message_send($eventdata);
         }
 
@@ -552,6 +556,11 @@ abstract class enrol_coursepayment_gateway {
             $a->user = fullname($user);
             $admins = get_admins();
             foreach ($admins as $admin) {
+                $adminemail = core_text::strtolower(trim($admin->email));
+                if (!empty($sentto[$adminemail])) {
+                    continue;
+                }
+                $sentto[$adminemail] = true;
                 $eventdata = enrol_coursepayment_helper::get_event_object();
                 $eventdata->modulename = 'moodle';
                 $eventdata->component = 'enrol_coursepayment';
