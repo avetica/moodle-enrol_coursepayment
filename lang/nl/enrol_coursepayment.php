@@ -150,20 +150,24 @@ Het bedrag is {$a->cost} {$a->currency}.<br>
 Met hartelijke groet,<br>
 {$a->sitename}';
 
-$string['mail:invoice_subject_admin'] = 'Bedankt voor het kopen van: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
-$string['mail:invoice_message_admin'] = 'Beste {$a->fullname},<br><br>
-Er is een betaling gedaan op {$a->date} via {$a->method}.<br>
-Bijgaand ontvangt u de factuur met factuurnummer {$a->invoice_number}.<br>
+$string['mail:invoice_subject_admin'] = 'Nieuwe betaling ontvangen: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
+$string['mail:invoice_message_admin'] = 'Beste docent / beheerder,<br><br>
+Er is een betaling gedaan door {$a->fullname} op {$a->date} via {$a->method} voor {$a->content_type} {$a->fullcourse}.<br>
+Factuurnummer: {$a->invoice_number}.<br>
 Het bedrag is {$a->cost} {$a->currency}.<br>
+<br>
+De factuur is bijgevoegd (zie bijlage PDF)<br>
 <br>
 Met hartelijke groet,<br>
 {$a->sitename}';
 
-$string['mail:invoice_subject_teacher'] = 'Bedankt voor het kopen van: {$a->content_type} - {$a->fullcourse} / {Ja$a->fullname}';
-$string['mail:invoice_message_teacher'] = 'Beste {$a->fullname},<br><br>
-Er is een betaling gedaan op {$a->date} via {$a->method}.<br>
-Bijgaand ontvangt u de factuur met factuurnummer {$a->invoice_number}.<br>
+$string['mail:invoice_subject_teacher'] = 'Nieuwe betaling ontvangen: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
+$string['mail:invoice_message_teacher'] = 'Beste docent / beheerder,<br><br>
+Er is een betaling gedaan door {$a->fullname} op {$a->date} via {$a->method} voor {$a->content_type} {$a->fullcourse}.<br>
+Factuurnummer: {$a->invoice_number}.<br>
 Het bedrag is {$a->cost} {$a->currency}.<br>
+<br>
+De factuur is bijgevoegd (zie bijlage PDF)<br>
 <br>
 Met hartelijke groet,<br>
 {$a->sitename}';

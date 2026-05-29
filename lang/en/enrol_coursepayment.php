@@ -162,24 +162,24 @@ The Invoice is attached (see attachment PDF)<br>
 Kind regards,<br>
 {$a->sitename}';
 
-$string['mail:invoice_subject_admin'] = 'Thank you for ordering: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
-$string['mail:invoice_message_admin'] = 'Dear {$a->fullname},<br><br>
-A payment has been made on {$a->date} through {$a->method}.<br>
-You will receive the invoice with invoice number {$a->invoice_number}. <br>
+$string['mail:invoice_subject_admin'] = 'New payment received: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
+$string['mail:invoice_message_admin'] = 'Dear teacher / administrator,<br><br>
+A payment has been made by {$a->fullname} on {$a->date} through {$a->method} for {$a->content_type} {$a->fullcourse}.<br>
+Invoice number: {$a->invoice_number}.<br>
 The amount is {$a->cost} {$a->currency}.<br>
 <br>
-The Invoice is attached (see attachment PDF)<br>
+The invoice is attached (see attachment PDF)<br>
 <br>
 Kind regards,<br>
 {$a->sitename}';
 
-$string['mail:invoice_subject_teacher'] = 'Thank you for ordering: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
-$string['mail:invoice_message_teacher'] = 'Dear {$a->fullname},<br><br>
-A payment has been made on {$a->date} through {$a->method}.<br>
-You will receive the invoice with invoice number {$a->invoice_number}. <br>
+$string['mail:invoice_subject_teacher'] = 'New payment received: {$a->content_type} - {$a->fullcourse} / {$a->fullname}';
+$string['mail:invoice_message_teacher'] = 'Dear teacher / administrator,<br><br>
+A payment has been made by {$a->fullname} on {$a->date} through {$a->method} for {$a->content_type} {$a->fullcourse}.<br>
+Invoice number: {$a->invoice_number}.<br>
 The amount is {$a->cost} {$a->currency}.<br>
 <br>
-The Invoice is attached (see attachment PDF)<br>
+The invoice is attached (see attachment PDF)<br>
 <br>
 Kind regards,<br>
 {$a->sitename}';
