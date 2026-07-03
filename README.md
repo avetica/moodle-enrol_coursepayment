@@ -3,6 +3,8 @@ Ldesign Media - Enrol CoursePayment
 
 With this plugin you can sell courses to your moodle users. There is also a [availability plugin](https://deploy01.avetica.net/technisch-team/moodlefreak/availability_coursepayment/) available.
 
+> **Related plugin:** `enrol_coursepayment` and `enrol_wppayment` share the same goal, selling courses to Moodle users through payment gateways. `enrol_wppayment` is the tenant-based (Moodle Workplace) variant of this plugin.
+
 ### Description
 
 This plugin allows you to sell courses with multiple gateways.
